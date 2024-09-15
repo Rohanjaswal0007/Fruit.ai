@@ -1,36 +1,70 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Chat.css'; // Add this line to import the CSS file
+import './Chat.css'; // Import the updated CSS file
 
-const fruits = [
-  { name: 'Apple', description: 'A sweet and crunchy fruit.' },
-  { name: 'Banana', description: 'A long yellow fruit with a soft inside.' },
-  { name: 'Orange', description: 'A citrus fruit with a tough outer layer.' },
-];
+const responses = {
+  hi: "Hello! How can I assist you?",
+  hello: "Hi there! Ask me anything about fruits.",
+  "how are you": "I'm just a chatbot, but I'm here to help you!",
+  apple: "Apples are great for your health! They are rich in fiber and vitamin C.",
+  banana: "Bananas are rich in potassium and help in maintaining healthy blood pressure.",
+  orange: "Oranges are packed with vitamin C, which boosts immunity!",
+  default: "I'm not sure about that, but feel free to ask about fruits or say hello!",
+};
+
+const suggestions = ['Hi', 'Hello', 'How are you?', 'Tell me about apples', 'Tell me about bananas', 'Tell me about oranges'];
 
 function Chat() {
-  const [selectedFruit, setSelectedFruit] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+
+  const handleSend = (text) => {
+    const userMessage = { text, sender: 'user' };
+    const systemReply = { text: responses[text.toLowerCase()] || responses.default, sender: 'system' };
+
+    setMessages([...messages, userMessage, systemReply]);
+    setInput(''); // Clear input after sending
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    handleSend(suggestion);
+  };
 
   return (
     <div className="chat-container">
-      <h2 className="chat-title">Fruit's and You</h2>
-      <div className="fruit-buttons">
-        {fruits.map((fruit) => (
+      <h2 className="chat-title">Fruit's Chat</h2>
+      
+      {/* Suggested questions */}
+      <div className="suggestions">
+        {suggestions.map((suggestion, index) => (
           <button
-            className="fruit-button"
-            key={fruit.name}
-            onClick={() => setSelectedFruit(fruit)}
+            key={index}
+            className="suggestion-button"
+            onClick={() => handleSuggestionClick(suggestion)}
           >
-            {fruit.name}
+            {suggestion}
           </button>
         ))}
       </div>
-      {selectedFruit && (
-        <div className="fruit-info">
-          <h3 className="fruit-name">{selectedFruit.name}</h3>
-          <p className="fruit-description">{selectedFruit.description}</p>
-        </div>
-      )}
+
+      <div className="chat-window">
+        {messages.map((msg, index) => (
+          <div key={index} className={`chat-message ${msg.sender}`}>
+            <p>{msg.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="chat-input">
+        <input 
+          type="text" 
+          value={input} 
+          onChange={(e) => setInput(e.target.value)} 
+          placeholder="Type your question here..."
+        />
+        <button onClick={() => handleSend(input)}>Send</button>
+      </div>
+      
       <Link className="back-link" to="/home">Back to Home</Link>
     </div>
   );
